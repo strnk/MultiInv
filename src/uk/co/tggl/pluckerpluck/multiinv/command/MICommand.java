@@ -10,12 +10,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-import me.drayshak.WorldInventories.Group;
-import me.drayshak.WorldInventories.InventoryLoadType;
-import me.drayshak.WorldInventories.InventoryStoredType;
-import me.drayshak.WorldInventories.PlayerStats;
-import me.drayshak.WorldInventories.WorldInventories;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
@@ -133,98 +127,6 @@ public class MICommand {
 				String defaultgroup = MIPlayerListener.getGroup(Bukkit.getWorlds().get(0).getName());
 				MCExportThread ithread = new MCExportThread(sender, plugin, defaultgroup);
 				plugin.getServer().getScheduler().runTaskAsynchronously(plugin, ithread);
-			} else if(command.equalsIgnoreCase("miimport")) {
-				Plugin p = plugin.getServer().getPluginManager().getPlugin("WorldInventories");
-				if(p == null) {
-					sender.sendMessage(ChatColor.DARK_RED + "I'm sorry, WorldInventories isn't loaded... Import aborted.");
-				} else {
-					WorldInventories mvinventories;
-					try {
-						mvinventories = (WorldInventories) p;
-					} catch(Exception e) {
-						MultiInv.log.severe("Unable to import inventories from WorldInventories.");
-						sender.sendMessage(ChatColor.DARK_RED + "I'm sorry, something funky happened... Import aborted.");
-						return;
-					}
-					ArrayList<Group> mvgroups = WorldInventories.groups;
-					YamlConfiguration groups = new YamlConfiguration();
-					MIYamlFiles.getGroups().clear();
-					for(Group mvgroup : mvgroups) {
-						List<String> mvworlds = mvgroup.getWorlds();
-						ArrayList<String> exampleGroup = new ArrayList<String>();
-						for(String world : mvworlds) {
-							exampleGroup.add(world);
-							MIYamlFiles.getGroups().put(world, mvgroup.getName());
-						}
-						String group = mvgroup.getName();
-						groups.set(group, exampleGroup);
-						MIYamlFiles.saveYamlFile(groups, "groups.yml");
-						for(OfflinePlayer player1 : Bukkit.getServer().getOfflinePlayers()) {
-							plugin.getLogger().info("Importing player " + player1.getName() + "'s inventory from group " + mvgroup.getName());
-							HashMap<Integer, ItemStack[]> pinventory = mvinventories.loadPlayerInventory(player1.getName(), mvgroup, InventoryLoadType.INVENTORY);
-							HashMap<Integer, ItemStack[]> playerenderchest = mvinventories.loadPlayerInventory(player1.getName(), mvgroup, InventoryLoadType.ENDERCHEST);
-							PlayerStats playerstats = mvinventories.loadPlayerStats(player1.getName(), mvgroup);
-							if(pinventory != null) {
-								ItemStack[] inventory = pinventory.get(InventoryStoredType.INVENTORY);
-								ItemStack[] armor = pinventory.get(InventoryStoredType.ARMOUR);
-								double health = 20;
-								int hunger = 20;
-								float saturation = 5;
-								int totalexp = 0;
-								int level = 0;
-								float exp = 0;
-								if(playerstats != null) {
-									health = playerstats.getHealth();
-									hunger = playerstats.getFoodLevel();
-									saturation = playerstats.getSaturation();
-									level = playerstats.getLevel();
-									exp = playerstats.getExp();
-									totalexp = plugin.getTotalXP(level, exp);
-								}
-								if(MIYamlFiles.usesql) {
-									if(playerenderchest != null) {
-										ItemStack[] enderchestinventory = playerenderchest.get(InventoryStoredType.ARMOUR);
-										MIYamlFiles.con.saveEnderchestInventory(player, group, new MIEnderchestInventory(enderchestinventory),
-												"SURVIVAL");
-									}
-									MIYamlFiles.con.saveInventory(player, group, new MIInventory(inventory, armor, new LinkedList<PotionEffect>()),
-											"SURVIVAL");
-									MIYamlFiles.con.saveHealth(player, group, health);
-									MIYamlFiles.con.saveHunger(player, group, hunger);
-									MIYamlFiles.con.saveSaturation(player, group, saturation);
-									MIYamlFiles.con.saveExperience(player, group, totalexp);
-								} else {
-									MIPlayerFile config = new MIPlayerFile(player1, group);
-									config.saveInventory(new MIInventory(inventory, armor, new LinkedList<PotionEffect>()), "SURVIVAL");
-									if(playerenderchest != null) {
-										ItemStack[] enderchestinventory = playerenderchest.get(InventoryStoredType.ARMOUR);
-										config.saveEnderchestInventory(new MIEnderchestInventory(enderchestinventory), "SURVIVAL");
-									}
-									config.saveHealth(health);
-									config.saveHunger(hunger);
-									config.saveSaturation(saturation);
-									config.saveExperience(totalexp, level, exp);
-								}
-							}
-						}
-					}
-
-					// Now to emulate WorldInventories behavior with worlds not in a group.
-					ArrayList<String> exampleGroup = new ArrayList<String>();
-					for(World world : Bukkit.getWorlds()) {
-						String worldName = world.getName();
-						if(!MIYamlFiles.getGroups().containsKey(worldName)) {
-							exampleGroup.add(worldName);
-							MIYamlFiles.getGroups().put(worldName, "default");
-						}
-					}
-					// Once the groups are loaded, let's load them into MultiInv
-					MIYamlFiles.parseGroups(groups);
-					// Once the import is done let's disable WorldInventories.
-					Bukkit.getPluginManager().disablePlugin(mvinventories);
-					sender.sendMessage(ChatColor.DARK_GREEN + "WorldInventories inventories imported successfuly!");
-					sender.sendMessage(ChatColor.DARK_GREEN + "Please disable/delete WorldInventories now.");
-				}
 			}
 		}else {
 			if(sender.hasPermission("multiinv.import")) {

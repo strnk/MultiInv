@@ -19,24 +19,36 @@
   <repositories>
     <repository>
       <id>spigot-repo</id>
-      <url>http://hub.spigot.org/nexus/content/groups/public/</url>
-    </repository>
-    <repository>
-      <id>spout-repo</id>
-      <url>http://repo.spout.org/</url>
+      <url>http://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
     </repository>
     </repositories>
   <dependencies>
     <dependency>
       <groupId>org.spigotmc</groupId>
       <artifactId>spigot-api</artifactId>
-      <version>1.9-R0.1-SNAPSHOT</version>
+      <version>1.12-R0.1-SNAPSHOT</version>
       <type>jar</type>
     </dependency>
     <dependency>
-      <groupId>org.getspout</groupId>
-      <artifactId>spoutplugin</artifactId>
-      <version>dev-SNAPSHOT</version>
+        <groupId>Tux2</groupId>
+        <artifactId>Tux2Lib</artifactId>
+        <version>1.12-b7</version>
+        <scope>system</scope>
+        <systemPath>${project.basedir}/3rd-party/tuxtwolib-1.12-b7.jar</systemPath>
+    </dependency>
+    <dependency>
+        <groupId>com.tux2mc.debugreport</groupId>
+        <artifactId>DebugReport</artifactId>
+        <version>1.0</version>
+        <scope>system</scope>
+        <systemPath>${project.basedir}/3rd-party/debugreport-1.0.jar</systemPath>
+    </dependency>
+    <dependency>
+        <groupId>com.onarandombox</groupId>
+        <artifactId>multiverseinventories</artifactId>
+        <version>2.5.0-SNAPSHOT</version>
+        <scope>system</scope>
+        <systemPath>${project.basedir}/3rd-party/multiverse-inventories-2.5.0-SNAPSHOT.jar</systemPath>
     </dependency>
   </dependencies>
   
@@ -81,8 +93,8 @@
         <inherited>true</inherited>
         <!-- If you don't code against Java 1.5, fix me here! -->
         <configuration>
-          <source>1.5</source>
-          <target>1.5</target>
+          <source>1.8</source>
+          <target>1.8</target>
         </configuration>
       </plugin>
     </plugins>
