@@ -5,7 +5,7 @@
   <artifactId>MultiInv</artifactId>
   <packaging>jar</packaging>
   <!-- Specify Version here in the same format. -->
-  <version>3.3.6</version>
+  <version>3.3.9-unofficial</version>
   <name>MultiInv</name>
   <url>http://www.github.com/Pluckerpluck/MultiInv</url>
   <properties>
